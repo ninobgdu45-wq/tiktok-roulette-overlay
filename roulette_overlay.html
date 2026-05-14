@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roue TikTok</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .roulette-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .roulette-wheel {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, #ff006e 0%, #8338ec 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .roulette-wheel.rotating {
+            animation: rotate 3s ease-out;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(720deg); }
+        }
+
+        .result {
+            position: absolute;
+            font-size: 28px;
+            color: white;
+            text-shadow: 0 0 10px black;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 25px;
+            border-radius: 15px;
+            animation: fadeOut 5s forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .trigger-message {
+            position: absolute;
+            top: -50px;
+            color: white;
+            font-size: 20px;
+            text-shadow: 0 0 5px black;
+            animation: slideUp 0.5s forwards;
+        }
+
+        @keyframes slideUp {
+            from { top: 0; opacity: 0; }
+            to { top: -50px; opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="roulette-container">
+        <div class="trigger-message" id="triggerMessage">En attente de "rose"... 👀</div>
+        <div class="roulette-wheel" id="rouletteWheel">TOURNE !</div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const triggerFile = "results.txt";
+        const rouletteWheel = document.getElementById('rouletteWheel');
+        const resultDiv = document.getElementById('result');
+        const triggerMessage = document.getElementById('triggerMessage');
+
+        const results = [
+            "🌹 Rose !",
+            "🎁 Cadeau !",
+            "💰 Argent !",
+            "🎮 Jeu vidéo !",
+            "🎤 Micro !",
+            "📦 Colis !",
+            "🔥 Feu !",
+            "❤️ Cœur !",
+            "💎 Diamant !"
+        ];
+
+        function triggerRoulette() {
+            triggerMessage.textContent = "La roue tourne !";
+            triggerMessage.style.animation = "slideUp 0.5s forwards";
+
+            rouletteWheel.classList.add('rotating');
+
+            setTimeout(() => {
+                const randomResult = results[Math.floor(Math.random() * results.length)];
+                resultDiv.textContent = randomResult;
+                resultDiv.style.opacity = "1";
+
+                setTimeout(() => {
+                    resultDiv.style.opacity = "0";
+                    triggerMessage.textContent = "En attente de 'rose'... 👀";
+                    triggerMessage.style.animation = "none";
+                    rouletteWheel.classList.remove('rotating');
+                }, 5000);
+            }, 3000);
+        }
+
+        setInterval(() => {
+            fetch(triggerFile)
+                .then(response => response.text())
+                .then(content => {
+                    if (content.trim() === "trigger") {
+                        triggerRoulette();
+                        // Réinitialiser le fichier
+                        fetch(triggerFile, { method: 'POST' });
+                    }
+                })
+                .catch(error => console.error("Erreur:", error));
+        }, 2000);
+    </script>
+</body>
+</html>
