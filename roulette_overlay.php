@@ -1,0 +1,106 @@
+<?php
+// Configuration des résultats possibles
+$ROULETTE_RESULTS = [
+    "🌹 Rose !",
+    "🎁 Cadeau !",
+    "💰 Argent !",
+    "🎮 Jeu vidéo !",
+    "🎤 Micro !",
+    "📦 Colis !",
+    "🔥 Feu !",
+    "❤️ Cœur !",
+    "💎 Diamant !"
+];
+
+// Chemin vers le fichier de déclenchement
+$triggerFile = "results.txt";
+
+// Lire le fichier pour voir s'il faut afficher la roue
+$shouldShow = false;
+if (file_exists($triggerFile)) {
+    $content = trim(file_get_contents($triggerFile));
+    if ($content === "trigger") {
+        $shouldShow = true;
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roue TikTok</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        .roulette-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .roulette {
+            background: linear-gradient(135deg, #ff6b6b, #ffa500, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .roulette h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .result {
+            color: white;
+            font-size: 3em;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <?php if ($shouldShow): ?>
+        <div class="roulette-container">
+            <div class="roulette">
+                <h1>🎡 ROUE ALÉATOIRE 🎡</h1>
+                <div class="result">
+                    <?php
+                    // Sélection aléatoire d'un résultat
+                    $randomResult = $ROULETTE_RESULTS[array_rand($ROULETTE_RESULTS)];
+                    echo $randomResult;
+                    ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Script pour cacher après 5 secondes -->
+        <script>
+            setTimeout(function() {
+                document.querySelector('.roulette-container').style.display = 'none';
+                // Réinitialiser le fichier de déclenchement
+                fetch('results.txt', { method: 'POST' });
+            }, 5000);
+        </script>
+    <?php endif; ?>
+</body>
+</html>
